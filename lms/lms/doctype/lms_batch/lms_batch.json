@@ -26,7 +26,7 @@
   "description",
   "column_break_hlqw",
   "instructors",
-  "zoom_account",
+  "telemost",
   "section_break_rgfj",
   "medium",
   "category",
@@ -361,12 +361,6 @@
    "fieldtype": "Section Break"
   },
   {
-   "fieldname": "zoom_account",
-   "fieldtype": "Link",
-   "label": "Zoom Account",
-   "options": "LMS Zoom Settings"
-  },
-  {
    "fieldname": "video_link",
    "fieldtype": "Attach",
    "label": "Preview Video"
@@ -385,6 +379,13 @@
   {
    "fieldname": "column_break_kpct",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "telemost",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "\u042f\u043d\u0434\u0435\u043a\u0441 \u0422\u0435\u043b\u0435\u043c\u043e\u0441\u0442",
+   "reqd": 1
   }
  ],
  "grid_page_length": 50,
@@ -407,8 +408,8 @@
    "link_fieldname": "payment_for_document"
   }
  ],
- "modified": "2026-01-13 18:50:27.420712",
- "modified_by": "sayali@frappe.io",
+ "modified": "2026-01-15 01:09:06.707926",
+ "modified_by": "Administrator",
  "module": "LMS",
  "name": "LMS Batch",
  "owner": "Administrator",

@@ -22,11 +22,12 @@
 			</div>
 		</header>
 		<div
-			v-if="batch.data"
+			v-if="batch.data && !batch.loading"
 			class="grid grid-cols-1 md:grid-cols-[75%,25%] h-[calc(100vh-3.2rem)]"
 		>
 			<div class="border-r">
 				<Tabs
+					v-if="showTabs"
 					v-model="tabIndex"
 					as="div"
 					:tabs="tabs"
@@ -122,10 +123,35 @@
 						</div>
 						<CourseInstructors :instructors="batch.data.instructors" />
 					</div>
+					<div v-if="batch.data.telemost" class="mt-6">
+						<div class="flex items-center gap-1">
+							<div class="inline-flex items-center p-0.5 rounded-md border bg-surface-gray-1 shadow-sm">
+								<a
+									:href="batch.data.telemost"
+									target="_blank"
+									class="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-ink-gray-8 hover:bg-surface-white rounded-l-[5px] transition-colors"
+								>
+									<Video class="h-4 w-4 text-ink-gray-5" />
+									<span>Телемост</span>
+								</a>
+
+								<div class="w-px h-4 bg-outline-gray-2"></div>
+
+								<button
+									@click="copyToClipboard(batch.data.telemost)"
+									class="flex items-center justify-center p-2 text-ink-gray-5 hover:text-ink-gray-9 hover:bg-surface-white rounded-r-[5px] transition-colors"
+									title="Скопировать ссылку"
+								>
+									<Check v-if="copied" class="h-3.5 w-3.5 text-green-600" />
+									<Copy v-else class="h-3.5 w-3.5" />
+								</button>
+							</div>
+						</div>
+					</div>
 					<DateRange
 						:startDate="batch.data.start_date"
 						:endDate="batch.data.end_date"
-						class="mb-3"
+						class="mb-3 mt-6"
 					/>
 					<div class="flex items-center mb-3 text-ink-gray-7">
 						<Clock class="h-4 w-4 stroke-1.5 mr-2" />
@@ -242,7 +268,7 @@ import {
 	SendIcon,
 	MessageCircle,
 	Globe,
-	ClipboardPen,
+	ClipboardPen, Copy, Video, Check
 } from 'lucide-vue-next'
 import { formatTime } from '@/utils'
 import { sessionStore } from '@/stores/session'
@@ -270,6 +296,20 @@ const router = useRouter()
 const { brand } = sessionStore()
 const tabIndex = ref(0)
 const readOnlyMode = window.read_only_mode
+
+const copied = ref(false)
+
+const copyToClipboard = async (text) => {
+	try {
+		await navigator.clipboard.writeText(text)
+		copied.ref = true
+		setTimeout(() => {
+			copied.value = false
+		}, 2000)
+	} catch (err) {
+		console.error('Не удалось скопировать текст: ', err)
+	}
+}
 
 const tabs = computed(() => {
 	let batchTabs = []

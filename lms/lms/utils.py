@@ -1144,6 +1144,7 @@ def get_batch_details(batch):
 			"timezone",
 			"category",
 			"zoom_account",
+			"telemost"
 		],
 		as_dict=True,
 	)

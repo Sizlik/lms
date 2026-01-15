@@ -1,5 +1,5 @@
 <template>
-	<div v-if="batch.data" class="">
+	<div v-if="batch.data && !batch.loading" class="">
 		<header
 			class="sticky top-0 z-10 border-b bg-surface-white px-3 py-2.5 sm:px-5"
 		>
@@ -73,9 +73,9 @@
 	</div>
 </template>
 <script setup>
-import { computed, inject } from 'vue'
+import { computed, inject, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { BookOpen, Clock } from 'lucide-vue-next'
+import { BookOpen, Clock, Video, Copy, Check } from 'lucide-vue-next'
 import { formatTime } from '@/utils'
 import { Breadcrumbs, createResource, usePageMeta } from 'frappe-ui'
 import { sessionStore } from '@/stores/session'
@@ -127,6 +127,20 @@ const breadcrumbs = computed(() => {
 	})
 	return items
 })
+
+const copied = ref(false)
+
+const copyToClipboard = async (text) => {
+	try {
+		await navigator.clipboard.writeText(text)
+		copied.ref = true
+		setTimeout(() => {
+			copied.value = false
+		}, 2000)
+	} catch (err) {
+		console.error('Не удалось скопировать текст: ', err)
+	}
+}
 
 usePageMeta(() => {
 	return {

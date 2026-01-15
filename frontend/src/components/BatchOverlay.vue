@@ -1,5 +1,5 @@
 <template>
-	<div v-if="batch.data" class="border-2 rounded-md p-5 lg:w-72">
+	<div v-if="batch.data && !batch.loading" class="border-2 rounded-md p-5 lg:w-72">
 		<div
 			v-if="batch.data.seat_count && seats_left > 0"
 			class="text-sm bg-green-100 text-green-700 px-2 py-1 rounded-md"
@@ -53,6 +53,31 @@
 			<span>
 				{{ batch.data.timezone }}
 			</span>
+		</div>
+		<div v-if="batch.data.telemost" class="mt-6 w-full">
+			<div class="flex items-center gap-1">
+				<div class="inline-flex items-center p-0.5 rounded-md border bg-surface-gray-1 shadow-sm w-full">
+					<a
+						:href="batch.data.telemost"
+						target="_blank"
+						class="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-ink-gray-8 hover:bg-surface-white rounded-l-[5px] transition-colors w-full"
+					>
+						<Video class="h-4 w-4 text-ink-gray-5" />
+						<span>Телемост</span>
+					</a>
+
+					<div class="w-px h-4 bg-outline-gray-2"></div>
+
+					<button
+						@click="copyToClipboard(batch.data.telemost)"
+						class="flex items-center justify-center p-2 text-ink-gray-5 hover:text-ink-gray-9 hover:bg-surface-white rounded-r-[5px] transition-colors"
+						title="Скопировать ссылку"
+					>
+						<Check v-if="copied" class="h-3.5 w-3.5 text-green-600" />
+						<Copy v-else class="h-3.5 w-3.5" />
+					</button>
+				</div>
+			</div>
 		</div>
 		<div v-if="!readOnlyMode">
 			<router-link
@@ -137,14 +162,14 @@
 import { inject, computed } from 'vue'
 import { Button, createResource, toast } from 'frappe-ui'
 import {
-	BookOpen,
-	Clock,
+	BookOpen, Check,
+	Clock, Copy,
 	CreditCard,
 	Globe,
 	GraduationCap,
 	LogIn,
 	Pencil,
-	Settings,
+	Settings, Video
 } from 'lucide-vue-next'
 import { formatNumberIntoCurrency, formatTime } from '@/utils'
 import DateRange from '@/components/Common/DateRange.vue'
