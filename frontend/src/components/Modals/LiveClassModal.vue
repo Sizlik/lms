@@ -159,7 +159,7 @@ const createLiveClass = createResource({
 		return {
 			doctype: 'LMS Live Class',
 			batch_name: values.batch,
-			// zoom_account: props.zoomAccount,
+			zoom_account: props.zoomAccount,
 			...values,
 		}
 	},
