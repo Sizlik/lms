@@ -166,6 +166,16 @@
 								}
 							"
 						/>
+						<Link
+							doctype="LMS Zoom Settings"
+							:label="__('Zoom Account')"
+							v-model="batch.zoom_account"
+							:onCreate="
+								(value, close) => {
+									openSettings('Zoom Accounts', close)
+								}
+							"
+						/>
 						<FormControl
 							v-model="batch.telemost"
 							:label="__('Яндекс Телемост')"
@@ -338,6 +348,7 @@ const batch = reactive({
 	paid_batch: false,
 	currency: '',
 	amount: 0,
+	zoom_account: '',
 	video_link: '',
 	telemost: '',
 })

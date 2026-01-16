@@ -1143,6 +1143,7 @@ def get_batch_details(batch):
 			"certification",
 			"timezone",
 			"category",
+			"zoom_account",
 			"telemost"
 		],
 		as_dict=True,
