@@ -22,7 +22,7 @@
 			</div>
 		</header>
 		<div
-			v-if="batch.data && !batch.loading"
+			v-if="batch.data"
 			class="grid grid-cols-1 md:grid-cols-[75%,25%] h-[calc(100vh-3.2rem)]"
 		>
 			<div class="border-r">
@@ -298,6 +298,7 @@ const tabIndex = ref(0)
 const readOnlyMode = window.read_only_mode
 
 const copied = ref(false)
+const showTabs = ref(false)
 
 const copyToClipboard = async (text) => {
 	try {
@@ -363,6 +364,7 @@ const props = defineProps({
 
 onMounted(() => {
 	const hash = route.hash
+	showTabs.value = true
 	if (hash) {
 		tabs.value.forEach((tab, index) => {
 			if (tab.label?.toLowerCase() === hash.replace('#', '')) {
