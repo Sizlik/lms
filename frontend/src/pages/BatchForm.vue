@@ -176,12 +176,6 @@
 								}
 							"
 						/>
-						<FormControl
-							v-model="batch.telemost"
-							:label="__('Яндекс Телемост')"
-							:required="true"
-							class="w-full"
-						/>
 					</div>
 					<div class="space-y-5">
 						<FormControl
@@ -350,7 +344,6 @@ const batch = reactive({
 	amount: 0,
 	zoom_account: '',
 	video_link: '',
-	telemost: '',
 })
 
 const meta = reactive({

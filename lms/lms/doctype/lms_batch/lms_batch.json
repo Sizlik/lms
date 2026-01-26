@@ -385,8 +385,7 @@
    "fieldname": "telemost",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "\u042f\u043d\u0434\u0435\u043a\u0441 \u0422\u0435\u043b\u0435\u043c\u043e\u0441\u0442",
-   "reqd": 1
+   "label": "\u042f\u043d\u0434\u0435\u043a\u0441 \u0422\u0435\u043b\u0435\u043c\u043e\u0441\u0442"
   },
   {
    "fieldname": "zoom_account",
@@ -415,7 +414,7 @@
    "link_fieldname": "payment_for_document"
   }
  ],
- "modified": "2026-01-16 12:08:08.535448",
+ "modified": "2026-01-22 21:25:44.146638",
  "modified_by": "Administrator",
  "module": "LMS",
  "name": "LMS Batch",

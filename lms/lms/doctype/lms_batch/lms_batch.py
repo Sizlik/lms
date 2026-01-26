@@ -1,6 +1,7 @@
 # Copyright (c) 2022, Frappe and contributors
 # For license information, please see license.txt
 
+import os
 import base64
 import json
 from datetime import timedelta
@@ -34,6 +35,15 @@ class LMSBatch(Document):
 		self.validate_duplicate_assessments()
 		self.validate_timetable()
 		self.validate_evaluation_end_date()
+
+	def before_insert(self):
+		key = frappe.conf.yandex_api_key
+		headers = {
+			"Authorization": f"OAuth {key}"
+		}
+		response = requests.post("https://cloud-api.yandex.net/v1/telemost-api/conferences", headers=headers).json()
+		print(123, response)
+		self.telemost = response.get("join_url")
 
 	def on_update(self):
 		if self.has_value_changed("published") and self.published:
