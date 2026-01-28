@@ -1,4 +1,5 @@
 <template>
+	<CalendarSchedule class="w-full h-full" />
 	<div
 		v-if="hasPermission() && !props.zoomAccount"
 		class="flex items-center space-x-2 mb-5 bg-surface-amber-1 py-1 px-2 rounded-md text-ink-amber-3 text-xs"
@@ -124,6 +125,7 @@ import { inject, ref } from 'vue'
 import { formatTime } from '@/utils/'
 import LiveClassModal from '@/components/Modals/LiveClassModal.vue'
 import LiveClassAttendance from '@/components/Modals/LiveClassAttendance.vue'
+import CalendarSchedule from '@/components/CalendarSchedule.vue'
 
 const user = inject('$user')
 const showLiveClassModal = ref(false)
