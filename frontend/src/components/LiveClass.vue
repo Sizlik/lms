@@ -1,5 +1,4 @@
 <template>
-	<CalendarSchedule class="w-full h-full" />
 	<div
 		v-if="hasPermission() && !props.zoomAccount"
 		class="flex items-center space-x-2 mb-5 bg-surface-amber-1 py-1 px-2 rounded-md text-ink-amber-3 text-xs"
@@ -100,6 +99,7 @@
 	<div v-else class="text-sm italic text-ink-gray-5 mt-2">
 		{{ __('No live classes scheduled') }}
 	</div>
+	<CalendarSchedule class="w-full h-full" />
 
 	<LiveClassModal
 		:batch="props.batch"
