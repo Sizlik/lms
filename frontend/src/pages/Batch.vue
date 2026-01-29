@@ -61,31 +61,31 @@
 					</template>
 					<template #tab-panel="{ tab }">
 						<div class="pt-5 px-5 pb-10">
-							<div v-if="tab.label == 'Courses'">
+							<div v-if="tab.label == 'Курсы'">
 								<BatchCourses :batch="batch.data.name" />
 							</div>
-							<div v-else-if="tab.label == 'Dashboard' && isStudent">
+							<div v-else-if="tab.label == 'Панель' && isStudent">
 								<BatchDashboard :batch="batch" :isStudent="isStudent" />
 							</div>
-							<div v-else-if="tab.label == 'Dashboard'">
+							<div v-else-if="tab.label == 'Панель'">
 								<AdminBatchDashboard :batch="batch" />
 							</div>
-							<div v-else-if="tab.label == 'Students'">
+							<div v-else-if="tab.label == 'Студенты'">
 								<BatchStudents :batch="batch" />
 							</div>
-							<div v-else-if="tab.label == 'Classes'">
+							<div v-else-if="tab.label == 'Занятия'">
 								<LiveClass
 									:batch="batch.data.name"
 									:zoomAccount="batch.data.zoom_account"
 								/>
 							</div>
-							<div v-else-if="tab.label == 'Assessments'">
+							<div v-else-if="tab.label == 'Оценки'">
 								<Assessments :batch="batch.data.name" />
 							</div>
-							<div v-else-if="tab.label == 'Announcements'">
+							<div v-else-if="tab.label == 'Анонсы'">
 								<Announcements :batch="batch.data.name" />
 							</div>
-							<div v-else-if="tab.label == 'Discussions'">
+							<div v-else-if="tab.label == 'Дискуссии'">
 								<Discussions
 									doctype="LMS Batch"
 									:docname="batch.data.name"
