@@ -42,8 +42,22 @@ class LMSBatch(Document):
 			"Authorization": f"OAuth {key}"
 		}
 		response = requests.post("https://cloud-api.yandex.net/v1/telemost-api/conferences", headers=headers).json()
-		print(123, response)
+		self.append("instructors", {
+			"instructor": self.get_or_create_instructor()
+		})
 		self.telemost = response.get("join_url")
+		self.timezone = "UTC+3"
+
+	def get_or_create_instructor(self):
+		user = frappe.session.user
+		evaluator = frappe.db.get_value("Course Evaluator", {"evaluator": user})
+		if not evaluator:
+			evaluator = frappe.new_doc("Course Evaluator")
+			evaluator.evaluator = user
+			evaluator.insert(ignore_permissions=True)
+			return evaluator
+		else:
+			return evaluator
 
 	def on_update(self):
 		if self.has_value_changed("published") and self.published:

@@ -315,41 +315,41 @@ const copyToClipboard = async (text) => {
 const tabs = computed(() => {
 	let batchTabs = []
 	batchTabs.push({
-		label: 'Dashboard',
+		label: 'Занятия',
+		icon: Laptop,
+	})
+
+	batchTabs.push({
+		label: 'Панель',
 		icon: LayoutDashboard,
 	})
 
 	if (isAdmin.value) {
 		batchTabs.push({
-			label: 'Students',
+			label: 'Студенты',
 			icon: ClipboardPen,
 		})
 	}
 
 	batchTabs.push({
-		label: 'Courses',
+		label: 'Курсы',
 		icon: BookOpen,
-	})
-
-	batchTabs.push({
-		label: 'Classes',
-		icon: Laptop,
 	})
 
 	if (isAdmin.value) {
 		batchTabs.push({
-			label: 'Assessments',
+			label: 'Оценки',
 			icon: BookOpenCheck,
 		})
 	}
 
 	batchTabs.push({
-		label: 'Announcements',
+		label: 'Анонсы',
 		icon: Mail,
 	})
 
 	batchTabs.push({
-		label: 'Discussions',
+		label: 'Дискуссии',
 		icon: MessageCircle,
 	})
 	return batchTabs

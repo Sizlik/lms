@@ -18,6 +18,16 @@
 				</div>
 			</div>
 			<div class="flex items-center gap-2">
+				<Button
+					variant="solid"
+					@click="showCreateBatchModal = true"
+					class="dark:bg-blue-600 dark:hover:bg-blue-700"
+				>
+					<template #prefix>
+						<Plus class="h-4 w-4" />
+					</template>
+					{{ __('Add') }}
+				</Button>
 				<div class="flex items-center border rounded-md dark:border-gray-700 bg-white dark:bg-gray-800">
 					<Button
 						variant="ghost"
@@ -52,26 +62,6 @@
 				</div>
 			</div>
 		</div>
-
-		<div class="flex items-center gap-4 mb-4 flex-wrap">
-			<div class="text-sm text-ink-gray-7 dark:text-gray-400">{{ __('Show:') }}</div>
-			<label class="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
-				<input type="checkbox" v-model="filters.batches" class="rounded dark:bg-gray-800 dark:border-gray-600" />
-				<div class="w-3 h-3 rounded" :style="{ backgroundColor: eventColors.batch }"></div>
-				<span class="text-sm dark:text-gray-300">{{ __('Batches') }}</span>
-			</label>
-			<label class="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
-				<input type="checkbox" v-model="filters.liveClasses" class="rounded dark:bg-gray-800 dark:border-gray-600" />
-				<div class="w-3 h-3 rounded" :style="{ backgroundColor: eventColors.liveClass }"></div>
-				<span class="text-sm dark:text-gray-300">{{ __('Live Classes') }}</span>
-			</label>
-			<label class="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
-				<input type="checkbox" v-model="filters.courses" class="rounded dark:bg-gray-800 dark:border-gray-600" />
-				<div class="w-3 h-3 rounded" :style="{ backgroundColor: eventColors.course }"></div>
-				<span class="text-sm dark:text-gray-300">{{ __('Courses') }}</span>
-			</label>
-		</div>
-
 		<div class="calendar-container bg-white dark:bg-gray-900 border dark:border-gray-700 rounded-lg overflow-hidden shadow-sm">
 			<div v-if="view === 'month'" class="month-view">
 				<div class="grid grid-cols-7 border-b dark:border-gray-700 bg-surface-gray-1 dark:bg-gray-800">
@@ -233,6 +223,81 @@
 			</div>
 		</div>
 
+		<Dialog
+			v-model="showCreateBatchModal"
+			:options="{
+				title: __('Create Batch'),
+				size: 'lg',
+				actions: [
+					{
+						label: __('Create'),
+						variant: 'solid',
+						onClick: (close) => createBatch(close),
+					},
+				],
+			}"
+		>
+			<template #body-content>
+				<div class="space-y-4">
+					<FormControl
+						v-model="newBatch.title"
+						:label="__('Title')"
+						:required="true"
+						class="w-full"
+					/>
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+						<FormControl
+							v-model="newBatch.start_date"
+							:label="__('Start Date')"
+							type="date"
+							:required="true"
+						/>
+						<FormControl
+							v-model="newBatch.end_date"
+							:label="__('End Date')"
+							type="date"
+							:required="true"
+						/>
+					</div>
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+						<FormControl
+							v-model="newBatch.start_time"
+							:label="__('Start Time')"
+							type="time"
+							:required="true"
+						/>
+						<FormControl
+							v-model="newBatch.end_time"
+							:label="__('End Time')"
+							type="time"
+							:required="true"
+						/>
+					</div>
+					<FormControl
+						v-model="newBatch.description"
+						:label="__('Description')"
+						type="textarea"
+						:rows="4"
+						:required="true"
+						:placeholder="__('Short description of the batch')"
+					/>
+					<div>
+						<label class="block text-sm text-ink-gray-5 mb-1">
+							{{ __('Batch Details') }}
+						</label>
+						<TextEditor
+							:content="newBatch.batch_details"
+							@change="(val) => (newBatch.batch_details = val)"
+							:editable="true"
+							:fixedMenu="true"
+							:required="true"
+							editorClass="prose-sm max-w-none border-b border-x bg-surface-gray-2 rounded-b-md py-1 px-2 min-h-[7rem] max-h-[20rem] overflow-y-scroll"
+						/>
+					</div>
+				</div>
+			</template>
+		</Dialog>
+
 		<Dialog v-model="showEventModal" :options="{ size: 'md' }">
 			<template #body-content>
 				<div v-if="selectedEvent" class="bg-white dark:bg-gray-900 rounded-lg overflow-hidden">
@@ -344,8 +409,8 @@
 </template>
 
 <script setup>
-import { ref, computed, inject, onMounted, watch } from 'vue'
-import { Button, Dialog, createResource, createListResource } from 'frappe-ui'
+import { ref, computed, inject, onMounted, watch, reactive } from 'vue'
+import { Button, Dialog, createResource, createListResource, FormControl, TextEditor, toast } from 'frappe-ui'
 // Добавлены новые иконки для модального окна
 import {
 	ChevronLeft,
@@ -354,31 +419,23 @@ import {
 	Calendar,
 	Clock,
 	AlignLeft,
-	BookOpen
+	BookOpen,
+	Plus
 } from 'lucide-vue-next'
 
 const dayjs = inject('$dayjs')
 const user = inject('$user')
 
-// View state
 const view = ref('month')
 const currentDate = ref(dayjs().toDate())
 
-// Filters
 const filters = ref({
 	batches: true,
-	liveClasses: true,
-	courses: true,
 })
 
-// Event colors (настроены для темной темы через opacity в классах, но базовые цвета остаются яркими)
 const eventColors = {
-	batch: '#4285f4', // Google blue
-	liveClass: '#ea4335', // Google red
-	course: '#34a853', // Google green
+	batch: '#4285f4',
 }
-
-// ... (Оставшаяся часть логики скрипта без изменений: weekDays, hours, API calls) ...
 
 const weekDays = computed(() => {
 	const days = []
@@ -455,10 +512,6 @@ const adminLiveClasses = createResource({
 	auto: false,
 })
 
-const liveClasses = computed(() => {
-	return isAdmin.value ? adminLiveClasses.data : myLiveClasses.data
-})
-
 watch(
 	() => [isAdmin.value, user.data],
 	() => {
@@ -506,47 +559,47 @@ const allEvents = computed(() => {
 		})
 	}
 
-	if (filters.value.liveClasses && liveClasses.value?.length) {
-		liveClasses.value.forEach((liveClass) => {
-			if (liveClass.date && liveClass.time) {
-				const startTime = dayjs(`${liveClass.date}T${liveClass.time}`)
-				const endTime = startTime.add(liveClass.duration || 60, 'minute')
-				events.push({
-					id: `liveclass-${liveClass.name}`,
-					type: 'liveClass',
-					title: liveClass.title,
-					description: liveClass.description,
-					date: liveClass.date,
-					startTime: liveClass.time,
-					endTime: endTime.format('HH:mm'),
-					color: eventColors.liveClass,
-					textColor: '#ffffff',
-					joinUrl: liveClass.join_url,
-					startUrl: liveClass.start_url,
-					batchName: liveClass.batch_name,
-					dateTime: `${dayjs(liveClass.date).format('MMM D, YYYY')} ${formatTime(liveClass.time)} - ${endTime.format('h:mm A')}`,
-				})
-			}
-		})
-	}
-
-	if (filters.value.courses && courses.data?.length) {
-		courses.data.forEach((course) => {
-			const courseDate = course.enrollment_date || course.creation || dayjs().format('YYYY-MM-DD')
-			events.push({
-				id: `course-${course.name}`,
-				type: 'course',
-				title: course.title || course.name,
-				date: courseDate,
-				startTime: '00:00',
-				endTime: '23:59',
-				color: eventColors.course,
-				textColor: '#ffffff',
-				courseName: course.name,
-				dateTime: dayjs(courseDate).format('MMM D, YYYY'),
-			})
-		})
-	}
+	// if (filters.value.liveClasses && liveClasses.value?.length) {
+	// 	liveClasses.value.forEach((liveClass) => {
+	// 		if (liveClass.date && liveClass.time) {
+	// 			const startTime = dayjs(`${liveClass.date}T${liveClass.time}`)
+	// 			const endTime = startTime.add(liveClass.duration || 60, 'minute')
+	// 			events.push({
+	// 				id: `liveclass-${liveClass.name}`,
+	// 				type: 'liveClass',
+	// 				title: liveClass.title,
+	// 				description: liveClass.description,
+	// 				date: liveClass.date,
+	// 				startTime: liveClass.time,
+	// 				endTime: endTime.format('HH:mm'),
+	// 				color: eventColors.liveClass,
+	// 				textColor: '#ffffff',
+	// 				joinUrl: liveClass.join_url,
+	// 				startUrl: liveClass.start_url,
+	// 				batchName: liveClass.batch_name,
+	// 				dateTime: `${dayjs(liveClass.date).format('MMM D, YYYY')} ${formatTime(liveClass.time)} - ${endTime.format('h:mm A')}`,
+	// 			})
+	// 		}
+	// 	})
+	// }
+	//
+	// if (filters.value.courses && courses.data?.length) {
+	// 	courses.data.forEach((course) => {
+	// 		const courseDate = course.enrollment_date || course.creation || dayjs().format('YYYY-MM-DD')
+	// 		events.push({
+	// 			id: `course-${course.name}`,
+	// 			type: 'course',
+	// 			title: course.title || course.name,
+	// 			date: courseDate,
+	// 			startTime: '00:00',
+	// 			endTime: '23:59',
+	// 			color: eventColors.course,
+	// 			textColor: '#ffffff',
+	// 			courseName: course.name,
+	// 			dateTime: dayjs(courseDate).format('MMM D, YYYY'),
+	// 		})
+	// 	})
+	// }
 	return events
 })
 
@@ -600,7 +653,77 @@ const openEventModal = (event) => {
 	showEventModal.value = true
 }
 
-// Helper to get readable Label
+const showCreateBatchModal = ref(false)
+const newBatch = reactive({
+	title: '',
+	start_date: '',
+	end_date: '',
+	description: '',
+	start_time: '',
+	end_time: '',
+	batch_details: '',
+})
+
+const createBatchResource = createResource({
+	url: 'frappe.client.insert',
+	makeParams() {
+		return {
+			doc: {
+				doctype: 'LMS Batch',
+				...newBatch,
+			},
+		}
+	},
+})
+
+const createBatch = (close) => {
+	if (!newBatch.title) {
+		toast.error(__('Please enter a title'))
+		return
+	}
+	if (!newBatch.start_date) {
+		toast.error(__('Please select a start date'))
+		return
+	}
+	if (!newBatch.end_date) {
+		toast.error(__('Please select an end date'))
+		return
+	}
+	if (!newBatch.start_time) {
+		toast.error(__('Please select a start time'))
+		return
+	}
+	if (!newBatch.end_time) {
+		toast.error(__('Please select an end time'))
+		return
+	}
+
+	createBatchResource.submit(
+		{},
+		{
+			onSuccess(data) {
+				toast.success(__('Batch created successfully'))
+				batches.reload()
+				resetBatchForm()
+				close()
+			},
+			onError(err) {
+				toast.error(err.messages?.[0] || err)
+			},
+		}
+	)
+}
+
+const resetBatchForm = () => {
+	newBatch.title = ''
+	newBatch.start_date = ''
+	newBatch.end_date = ''
+	newBatch.description = ''
+	newBatch.start_time = ''
+	newBatch.end_time = ''
+	newBatch.batch_details = ''
+}
+
 const getTypeLabel = (type) => {
 	const map = {
 		batch: 'Batch',
@@ -613,6 +736,13 @@ const getTypeLabel = (type) => {
 watch(view, () => {
 	if (view.value === 'week') {
 		currentDate.value = dayjs(currentDate.value).startOf('week').toDate()
+	}
+})
+
+watch(showCreateBatchModal, (newVal) => {
+	if (!newVal) {
+		// Сброс формы при закрытии модального окна
+		resetBatchForm()
 	}
 })
 </script>

@@ -319,14 +319,14 @@
    "fieldname": "timezone",
    "fieldtype": "Data",
    "label": "Timezone",
-   "reqd": 1
+   "reqd": 0
   },
   {
    "fieldname": "instructors",
    "fieldtype": "Table MultiSelect",
    "label": "Instructors",
    "options": "Course Instructor",
-   "reqd": 1
+   "reqd": 0
   },
   {
    "fieldname": "section_break_khcn",
