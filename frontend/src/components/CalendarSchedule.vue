@@ -226,7 +226,7 @@
 		<Dialog
 			v-model="showCreateBatchModal"
 			:options="{
-				title: __('Create Batch'),
+				title: __('Создать занятие'),
 				size: 'lg',
 				actions: [
 					{
