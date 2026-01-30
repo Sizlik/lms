@@ -864,7 +864,7 @@ msgstr "Поток:"
 #: frontend/src/pages/Batches.vue:350 frontend/src/pages/Batches.vue:357
 #: lms/lms/doctype/lms_settings/lms_settings.json lms/www/lms.py:121
 msgid "Batches"
-msgstr "Мои занятия"
+msgstr "Мои направления"
 
 #: lms/templates/emails/batch_confirmation.html:33
 #: lms/templates/emails/batch_start_reminder.html:31

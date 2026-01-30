@@ -234,7 +234,7 @@
 				size: 'lg',
 				actions: [
 					{
-						label: __('Create'),
+						label: __('Создать'),
 						variant: 'solid',
 						onClick: (close) => createBatch(close),
 					},
@@ -245,7 +245,7 @@
 				<div class="space-y-4">
 					<FormControl
 						v-model="newBatch.title"
-						:label="__('Title')"
+						:label="__('Название')"
 						:required="true"
 						class="w-full"
 					/>
@@ -260,13 +260,13 @@
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 						<FormControl
 							v-model="newBatch.start_date"
-							:label="__('Start Date')"
+							:label="__('Дата начала')"
 							type="date"
 							:required="true"
 						/>
 						<FormControl
 							v-model="newBatch.end_date"
-							:label="__('End Date')"
+							:label="__('Дата окончания')"
 							type="date"
 							:required="true"
 						/>
@@ -275,13 +275,13 @@
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 						<FormControl
 							v-model="newBatch.start_time"
-							:label="__('Start Time')"
+							:label="__('Время начала')"
 							type="time"
 							:required="true"
 						/>
 						<FormControl
 							v-model="newBatch.end_time"
-							:label="__('End Time')"
+							:label="__('Время окончания')"
 							type="time"
 							:required="true"
 						/>
@@ -298,16 +298,16 @@
 					
 					<FormControl
 						v-model="newBatch.description"
-						:label="__('Description')"
+						:label="__('Описание')"
 						type="textarea"
 						:rows="4"
 						:required="true"
-						:placeholder="__('Short description of the batch')"
+						:placeholder="__('Краткое описание направления')"
 					/>
 					
 					<div>
 						<label class="block text-sm text-ink-gray-5 mb-1">
-							{{ __('Batch Details') }}
+							{{ __('Детали направления') }}
 						</label>
 						<TextEditor
 							:content="newBatch.batch_details"
@@ -369,7 +369,7 @@
 								<BookOpen class="w-5 h-5 text-gray-400 dark:text-gray-500 mt-0.5" />
 								<div>
 									<div class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-										{{ selectedEvent.type === 'course' ? __('Course') : __('Batch') }}
+										{{ selectedEvent.type === 'course' ? __('Курс') : __('Направление') }}
 									</div>
 									<div class="text-sm text-gray-900 dark:text-gray-100 font-medium mt-0.5">
 										{{ selectedEvent.batchName || selectedEvent.courseName }}
@@ -400,7 +400,7 @@
 								class="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 transition-colors shadow-sm"
 							>
 								<Video class="h-4 w-4" />
-								{{ __('Join Class') }}
+								{{ __('Присоединиться к занятию') }}
 							</a>
 
 							<router-link
@@ -411,7 +411,7 @@
                 }"
 								class="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 text-sm font-medium rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
 							>
-								{{ __('View Batch') }}
+								{{ __('Посмотреть направление') }}
 							</router-link>
 
 							<router-link
@@ -422,7 +422,7 @@
                 }"
 								class="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 text-sm font-medium rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
 							>
-								{{ __('View Course') }}
+								{{ __('Посмотреть курс') }}
 							</router-link>
 						</div>
 					</div>
@@ -797,31 +797,31 @@ const createBatchResource = createResource({
 
 const createBatch = (close) => {
 	if (!newBatch.title) {
-		toast.error(__('Please enter a title'))
+		toast.error(__('Пожалуйста, введите название'))
 		return
 	}
 	if (!batchCategories.value || batchCategories.value.length === 0) {
-		toast.error(__('Please select at least one category'))
+		toast.error(__('Пожалуйста, выберите хотя бы одну категорию'))
 		return
 	}
 	if (!newBatch.start_date) {
-		toast.error(__('Please select a start date'))
+		toast.error(__('Пожалуйста, выберите дату начала'))
 		return
 	}
 	if (!newBatch.end_date) {
-		toast.error(__('Please select an end date'))
+		toast.error(__('Пожалуйста, выберите дату окончания'))
 		return
 	}
 	if (!newBatch.start_time) {
-		toast.error(__('Please select a start time'))
+		toast.error(__('Пожалуйста, выберите время начала'))
 		return
 	}
 	if (!newBatch.end_time) {
-		toast.error(__('Please select an end time'))
+		toast.error(__('Пожалуйста, выберите время окончания'))
 		return
 	}
 	if (!newBatch.timezone) {
-		toast.error(__('Please enter a timezone'))
+		toast.error(__('Пожалуйста, выберите часовой пояс'))
 		return
 	}
 
@@ -829,7 +829,7 @@ const createBatch = (close) => {
 		{},
 		{
 			onSuccess(data) {
-				toast.success(__('Batch created successfully'))
+				toast.success(__('Направление успешно создано'))
 				batches.reload()
 				resetBatchForm()
 				close()
