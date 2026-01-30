@@ -3,7 +3,7 @@
 		<div class="flex items-center justify-between mb-6 flex-wrap gap-4">
 			<div class="flex items-center gap-4">
 				<Button variant="ghost" @click="goToToday" class="text-sm dark:text-gray-300 dark:hover:bg-gray-800">
-					{{ __('Today') }}
+					{{ __('Сегодня') }}
 				</Button>
 				<div class="flex items-center gap-2">
 					<Button variant="ghost" @click="previousPeriod" class="p-2 dark:text-gray-300 dark:hover:bg-gray-800">
@@ -27,7 +27,7 @@
 					<template #prefix>
 						<Plus class="h-4 w-4" />
 					</template>
-					{{ __('Add') }}
+					{{ __('Добавить') }}
 				</Button>
 				<div class="flex items-center border rounded-md dark:border-gray-700 bg-white dark:bg-gray-800">
 					<Button
@@ -38,7 +38,7 @@
             ]"
 						@click="view = 'month'"
 					>
-						{{ __('Month') }}
+						{{ __('Месяц') }}
 					</Button>
 					<Button
 						variant="ghost"
@@ -48,7 +48,7 @@
             ]"
 						@click="view = 'week'"
 					>
-						{{ __('Week') }}
+						{{ __('Неделя') }}
 					</Button>
 					<Button
 						variant="ghost"
@@ -58,7 +58,7 @@
             ]"
 						@click="view = 'day'"
 					>
-						{{ __('Day') }}
+						{{ __('День') }}
 					</Button>
 				</div>
 			</div>
@@ -322,7 +322,13 @@
 			</template>
 		</Dialog>
 
-		<Dialog v-model="showEventModal" :options="{ size: 'md' }">
+		<Dialog 
+			v-model="showEventModal" 
+			:options="{ 
+				title: selectedEvent?.title || __('Детали события'),
+				size: 'md' 
+			}"
+		>
 			<template #body-content>
 				<div v-if="selectedEvent" class="bg-white dark:bg-gray-900 rounded-lg overflow-hidden">
 
@@ -330,13 +336,8 @@
 
 					<div class="p-6">
 						<div class="flex items-start justify-between gap-4 mb-6">
-							<div>
-								<h2 class="text-xl font-bold text-gray-900 dark:text-white leading-tight">
-									{{ selectedEvent.title }}
-								</h2>
-								<div class="mt-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300">
-									{{ getTypeLabel(selectedEvent.type) }}
-								</div>
+							<div class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300">
+								{{ getTypeLabel(selectedEvent.type) }}
 							</div>
 						</div>
 
@@ -345,7 +346,7 @@
 								<Calendar class="w-5 h-5 text-gray-400 dark:text-gray-500 mt-0.5" />
 								<div>
 									<div class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-										{{ __('Date') }}
+										{{ __('Дата') }}
 									</div>
 									<div class="text-sm text-gray-900 dark:text-gray-100 font-medium mt-0.5">
 										{{ dayjs(selectedEvent.date).format('dddd, D MMM YYYY') }}
@@ -357,7 +358,7 @@
 								<Clock class="w-5 h-5 text-gray-400 dark:text-gray-500 mt-0.5" />
 								<div>
 									<div class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-										{{ __('Time') }}
+										{{ __('Время') }}
 									</div>
 									<div class="text-sm text-gray-900 dark:text-gray-100 font-medium mt-0.5">
 										{{ formatTime(selectedEvent.startTime) }} - {{ formatTime(selectedEvent.endTime) }}
@@ -383,7 +384,7 @@
 								<AlignLeft class="w-5 h-5 text-gray-400 dark:text-gray-500 mt-0.5" />
 								<div class="w-full">
 									<div class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-										{{ __('Description') }}
+										{{ __('Описание') }}
 									</div>
 									<div class="text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 rounded p-3 leading-relaxed whitespace-pre-wrap">
 										{{ selectedEvent.description }}
@@ -855,9 +856,9 @@ const resetBatchForm = () => {
 
 const getTypeLabel = (type) => {
 	const map = {
-		batch: 'Batch',
-		liveClass: 'Live Class',
-		course: 'Course'
+		batch: 'Направление',
+		liveClass: 'Прямой эфир',
+		course: 'Курс'
 	}
 	return map[type] || type
 }
