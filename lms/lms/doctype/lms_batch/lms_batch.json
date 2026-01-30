@@ -205,7 +205,7 @@
    "fieldname": "batch_details",
    "fieldtype": "Text Editor",
    "label": "Batch Details",
-   "reqd": 1
+   "reqd": 0
   },
   {
    "default": "0",
@@ -312,14 +312,14 @@
    "fieldname": "timezone",
    "fieldtype": "Data",
    "label": "Timezone",
-   "reqd": 1
+   "reqd": 0
   },
   {
    "fieldname": "instructors",
    "fieldtype": "Table MultiSelect",
    "label": "Instructors",
    "options": "Course Instructor",
-   "reqd": 1
+   "reqd": 0
   },
   {
    "fieldname": "section_break_khcn",
@@ -392,7 +392,7 @@
    "in_standard_filter": 1,
    "label": "Categories",
    "options": "Batch Categories",
-   "reqd": 1
+   "reqd": 0
   }
  ],
  "grid_page_length": 50,
