@@ -249,6 +249,14 @@
 						:required="true"
 						class="w-full"
 					/>
+					
+					<MultiSelect
+						v-model="batchCategories"
+						doctype="LMS Category"
+						:label="__('Категории')"
+						:required="true"
+					/>
+					
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 						<FormControl
 							v-model="newBatch.start_date"
@@ -263,6 +271,7 @@
 							:required="true"
 						/>
 					</div>
+					
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 						<FormControl
 							v-model="newBatch.start_time"
@@ -277,6 +286,16 @@
 							:required="true"
 						/>
 					</div>
+					
+					<FormControl
+						v-model="newBatch.timezone"
+						:label="__('Часовой пояс')"
+						type="select"
+						:options="timezoneOptions"
+						:required="true"
+						:placeholder="__('Выберите часовой пояс')"
+					/>
+					
 					<FormControl
 						v-model="newBatch.description"
 						:label="__('Description')"
@@ -285,6 +304,7 @@
 						:required="true"
 						:placeholder="__('Short description of the batch')"
 					/>
+					
 					<div>
 						<label class="block text-sm text-ink-gray-5 mb-1">
 							{{ __('Batch Details') }}
@@ -415,6 +435,7 @@
 <script setup>
 import { ref, computed, inject, onMounted, watch, reactive } from 'vue'
 import { Button, Dialog, createResource, createListResource, FormControl, TextEditor, toast } from 'frappe-ui'
+import MultiSelect from '@/components/Controls/MultiSelect.vue'
 // Добавлены новые иконки для модального окна
 import {
 	ChevronLeft,
@@ -724,6 +745,7 @@ const openEventModal = (event) => {
 }
 
 const showCreateBatchModal = ref(false)
+const batchCategories = ref([])
 const newBatch = reactive({
 	title: '',
 	start_date: '',
@@ -731,8 +753,32 @@ const newBatch = reactive({
 	description: '',
 	start_time: '',
 	end_time: '',
+	timezone: '',
 	batch_details: '',
 })
+
+// Популярные часовые пояса
+const timezoneOptions = [
+	{ label: 'UTC+3 (Москва)', value: 'Europe/Moscow' },
+	{ label: 'UTC+5 (Екатеринбург)', value: 'Asia/Yekaterinburg' },
+	{ label: 'UTC+6 (Алматы, Омск)', value: 'Asia/Almaty' },
+	{ label: 'UTC+7 (Новосибирск)', value: 'Asia/Novosibirsk' },
+	{ label: 'UTC+8 (Иркутск)', value: 'Asia/Irkutsk' },
+	{ label: 'UTC+9 (Якутск)', value: 'Asia/Yakutsk' },
+	{ label: 'UTC+10 (Владивосток)', value: 'Asia/Vladivostok' },
+	{ label: 'UTC+11 (Магадан)', value: 'Asia/Magadan' },
+	{ label: 'UTC+12 (Камчатка)', value: 'Asia/Kamchatka' },
+	{ label: 'UTC+4 (Самара)', value: 'Europe/Samara' },
+	{ label: 'UTC+5 (Ташкент)', value: 'Asia/Tashkent' },
+	{ label: 'UTC+6 (Бишкек)', value: 'Asia/Bishkek' },
+	{ label: 'UTC+0 (UTC/GMT)', value: 'UTC' },
+	{ label: 'UTC+1 (Лондон)', value: 'Europe/London' },
+	{ label: 'UTC+2 (Киев)', value: 'Europe/Kiev' },
+	{ label: 'UTC-5 (Нью-Йорк)', value: 'America/New_York' },
+	{ label: 'UTC-8 (Лос-Анджелес)', value: 'America/Los_Angeles' },
+	{ label: 'UTC+8 (Пекин)', value: 'Asia/Shanghai' },
+	{ label: 'UTC+9 (Токио)', value: 'Asia/Tokyo' },
+]
 
 const createBatchResource = createResource({
 	url: 'frappe.client.insert',
@@ -741,6 +787,9 @@ const createBatchResource = createResource({
 			doc: {
 				doctype: 'LMS Batch',
 				...newBatch,
+				categories: batchCategories.value.map((category) => ({
+					category: category,
+				})),
 			},
 		}
 	},
@@ -749,6 +798,10 @@ const createBatchResource = createResource({
 const createBatch = (close) => {
 	if (!newBatch.title) {
 		toast.error(__('Please enter a title'))
+		return
+	}
+	if (!batchCategories.value || batchCategories.value.length === 0) {
+		toast.error(__('Please select at least one category'))
 		return
 	}
 	if (!newBatch.start_date) {
@@ -765,6 +818,10 @@ const createBatch = (close) => {
 	}
 	if (!newBatch.end_time) {
 		toast.error(__('Please select an end time'))
+		return
+	}
+	if (!newBatch.timezone) {
+		toast.error(__('Please enter a timezone'))
 		return
 	}
 
@@ -791,7 +848,9 @@ const resetBatchForm = () => {
 	newBatch.description = ''
 	newBatch.start_time = ''
 	newBatch.end_time = ''
+	newBatch.timezone = ''
 	newBatch.batch_details = ''
+	batchCategories.value = []
 }
 
 const getTypeLabel = (type) => {
@@ -814,6 +873,34 @@ watch(showCreateBatchModal, (newVal) => {
 		// Сброс формы при закрытии модального окна
 		resetBatchForm()
 	}
+})
+
+// Автоматическая установка дат при выборе времени
+watch(() => newBatch.start_time, (newTime) => {
+	if (!newTime) return
+	
+	const now = dayjs()
+	const selectedTime = dayjs(`${now.format('YYYY-MM-DD')}T${newTime}`)
+	
+	// Если выбранное время еще не прошло сегодня - ставим сегодня
+	// Если уже прошло - ставим завтра
+	if (selectedTime.isAfter(now)) {
+		newBatch.start_date = now.format('YYYY-MM-DD')
+		newBatch.end_date = now.format('YYYY-MM-DD')
+	} else {
+		const tomorrow = now.add(1, 'day')
+		newBatch.start_date = tomorrow.format('YYYY-MM-DD')
+		newBatch.end_date = tomorrow.format('YYYY-MM-DD')
+	}
+})
+
+// Автоматически устанавливаем end_time на час позже start_time
+watch(() => newBatch.start_time, (newTime) => {
+	if (!newTime || newBatch.end_time) return
+	
+	const startTime = dayjs(`2000-01-01T${newTime}`)
+	const endTime = startTime.add(1, 'hour')
+	newBatch.end_time = endTime.format('HH:mm')
 })
 </script>
 

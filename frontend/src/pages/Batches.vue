@@ -3,48 +3,48 @@
 		class="sticky flex items-center justify-between top-0 z-10 border-b bg-surface-white px-3 py-2.5 sm:px-5"
 	>
 		<Breadcrumbs :items="breadcrumbs" />
-		<Dropdown
-			v-if="canCreateBatch()"
-			:options="[
-				{
-					label: __('New Batch'),
-					icon: 'users',
-					onClick() {
-						router.push({
-							name: 'BatchForm',
-							params: { batchName: 'new' },
-						})
-					},
-				},
-				{
-					label: __('Import Batch'),
-					icon: 'upload',
-					onClick() {
-						router.push({
-							name: 'NewDataImport',
-							params: { doctype: 'LMS Batch' },
-						})
-					},
-				},
-			]"
-		>
-			<template v-slot="{ open }">
-				<Button variant="solid">
-					<template #prefix>
-						<Plus class="h-4 w-4 stroke-1.5" />
-					</template>
-					{{ __('Create') }}
-					<template #suffix>
-						<ChevronDown
-							:class="[
-								'w-4 h-4 stroke-1.5 ml-1 transform transition-transform',
-								open ? 'rotate-180' : '',
-							]"
-						/>
-					</template>
-				</Button>
-			</template>
-		</Dropdown>
+<!--		<Dropdown-->
+<!--			v-if="canCreateBatch()"-->
+<!--			:options="[-->
+<!--				{-->
+<!--					label: __('New Batch'),-->
+<!--					icon: 'users',-->
+<!--					onClick() {-->
+<!--						router.push({-->
+<!--							name: 'BatchForm',-->
+<!--							params: { batchName: 'new' },-->
+<!--						})-->
+<!--					},-->
+<!--				},-->
+<!--				{-->
+<!--					label: __('Import Batch'),-->
+<!--					icon: 'upload',-->
+<!--					onClick() {-->
+<!--						router.push({-->
+<!--							name: 'NewDataImport',-->
+<!--							params: { doctype: 'LMS Batch' },-->
+<!--						})-->
+<!--					},-->
+<!--				},-->
+<!--			]"-->
+<!--		>-->
+<!--			<template v-slot="{ open }">-->
+<!--				<Button variant="solid">-->
+<!--					<template #prefix>-->
+<!--						<Plus class="h-4 w-4 stroke-1.5" />-->
+<!--					</template>-->
+<!--					{{ __('Create') }}-->
+<!--					<template #suffix>-->
+<!--						<ChevronDown-->
+<!--							:class="[-->
+<!--								'w-4 h-4 stroke-1.5 ml-1 transform transition-transform',-->
+<!--								open ? 'rotate-180' : '',-->
+<!--							]"-->
+<!--						/>-->
+<!--					</template>-->
+<!--				</Button>-->
+<!--			</template>-->
+<!--		</Dropdown>-->
 		<!-- <router-link
 			v-if="canCreateBatch()"
 			:to="{

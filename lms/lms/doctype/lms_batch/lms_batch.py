@@ -47,7 +47,6 @@ class LMSBatch(Document):
 				"instructor": self.get_or_create_instructor()
 			})
 		self.telemost = response.get("join_url")
-		self.timezone = "UTC+3"
 
 	def get_or_create_instructor(self):
 		user = frappe.session.user
