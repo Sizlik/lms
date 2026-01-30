@@ -1,145 +1,83 @@
 <template>
 	<div>
-		<div v-if="myCourses.data?.length" class="mt-10">
-			<div class="flex items-center justify-between mb-3">
-				<span class="font-semibold text-lg text-ink-gray-9">
-					{{
-						myCourses.data[0].membership
-							? __('My Courses')
-							: __('Our Popular Courses')
-					}}
-				</span>
-				<router-link
-					:to="{
-						name: 'Courses',
-					}"
-				>
-					<span class="flex items-center space-x-1 text-ink-gray-5 text-xs">
-						<span>
-							{{ __('See all') }}
-						</span>
-						<MoveRight class="size-3 stroke-1.5" />
-					</span>
-				</router-link>
-			</div>
-			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-				<router-link
-					v-for="course in myCourses.data"
-					:to="{ name: 'CourseDetail', params: { courseName: course.name } }"
-				>
-					<CourseCard :course="course" />
-				</router-link>
-			</div>
-		</div>
-
-		<div v-if="myBatches.data?.length" class="mt-10">
-			<div class="flex items-center justify-between mb-3">
-				<span class="font-semibold text-lg text-ink-gray-9">
-					{{
-						myBatches.data?.[0].students.includes(user.data?.name)
-							? __('My Batches')
-							: __('Our Upcoming Batches')
-					}}
-				</span>
-				<router-link
-					:to="{
-						name: 'Batches',
-					}"
-				>
-					<span class="flex items-center space-x-1 text-ink-gray-5 text-xs">
-						<span>
-							{{ __('See all') }}
-						</span>
-						<MoveRight class="size-3 stroke-1.5" />
-					</span>
-				</router-link>
-			</div>
-			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-				<router-link
-					v-for="batch in myBatches.data"
-					:to="{ name: 'BatchDetail', params: { batchName: batch.name } }"
-				>
-					<BatchCard :batch="batch" />
-				</router-link>
-			</div>
-		</div>
-
-		<div class="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-5 mt-10">
-			<UpcomingEvaluations :forHome="true" />
-			<div v-if="myLiveClasses.data?.length">
-				<div class="font-semibold text-lg mb-3 text-ink-gray-9">
-					{{ __('Upcoming Live Classes') }}
+		<!-- Filters Section -->
+		<div class="mb-6 flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:items-center sm:justify-between">
+			<div class="flex items-center gap-3">
+				<div class="flex items-center gap-2">
+					<div class="w-1 h-8 bg-blue-600 dark:bg-blue-500 rounded-full"></div>
+					<h2 class="text-xl font-bold text-ink-gray-9 dark:text-white">
+						{{ __('Расписание') }}
+					</h2>
 				</div>
-				<div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-					<div
-						v-for="cls in myLiveClasses.data"
-						class="border rounded-md hover:border-outline-gray-3 p-2"
-					>
-						<div class="font-semibold text-ink-gray-9 text-lg leading-5 mb-1">
-							{{ cls.title }}
-						</div>
-						<div class="text-ink-gray-7 text-sm leading-5 mb-4">
-							{{ cls.description }}
-						</div>
-						<div class="mt-auto space-y-3 text-ink-gray-7 text-sm">
-							<div class="flex items-center space-x-2">
-								<Calendar class="w-4 h-4 stroke-1.5" />
-								<span>
-									{{ dayjs(cls.date).format('DD MMMM YYYY') }}
-								</span>
-							</div>
-							<div class="flex items-center space-x-2">
-								<Clock class="w-4 h-4 stroke-1.5" />
-								<span>
-									{{ formatTime(cls.time) }} -
-									{{ dayjs(getClassEnd(cls)).format('HH:mm A') }}
-								</span>
-							</div>
-							<div
-								v-if="canAccessClass(cls)"
-								class="flex items-center space-x-2 text-ink-gray-9 mt-auto"
-							>
-								<a
-									v-if="user.data?.is_moderator || user.data?.is_evaluator"
-									:href="cls.start_url"
-									target="_blank"
-									class="cursor-pointer inline-flex items-center justify-center gap-2 transition-colors focus:outline-none text-ink-gray-8 bg-surface-gray-2 hover:bg-surface-gray-3 active:bg-surface-gray-4 focus-visible:ring focus-visible:ring-outline-gray-3 h-7 text-base px-2 rounded"
-									:class="cls.join_url ? 'w-full' : 'w-1/2'"
-								>
-									<Monitor class="h-4 w-4 stroke-1.5" />
-									{{ __('Start') }}
-								</a>
-								<a
-									:href="cls.join_url"
-									target="_blank"
-									class="w-full cursor-pointer inline-flex items-center justify-center gap-2 transition-colors focus:outline-none text-ink-gray-8 bg-surface-gray-2 hover:bg-surface-gray-3 active:bg-surface-gray-4 focus-visible:ring focus-visible:ring-outline-gray-3 h-7 text-base px-2 rounded"
-								>
-									<Video class="h-4 w-4 stroke-1.5" />
-									{{ __('Join') }}
-								</a>
-							</div>
-							<Tooltip
-								v-else-if="hasClassEnded(cls)"
-								:text="__('This class has ended')"
-								placement="right"
-							>
-								<div class="flex items-center space-x-2 text-ink-amber-3 w-fit">
-									<Info class="w-4 h-4 stroke-1.5" />
-									<span>
-										{{ __('Ended') }}
-									</span>
-								</div>
-							</Tooltip>
-						</div>
+			</div>
+			
+			<div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
+				<!-- Category Filter -->
+				<div class="relative group">
+					<div class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none z-10">
+						<Layers class="w-4 h-4 text-gray-400 dark:text-gray-500 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" />
 					</div>
+					<Select
+						v-model="selectedCategory"
+						:options="categoryOptions"
+						:placeholder="__('Категория')"
+						class="w-full sm:w-56 pl-10"
+						@update:modelValue="onCategoryChange"
+					/>
+				</div>
+
+				<!-- Instructor Filter -->
+				<div class="relative group">
+					<div class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none z-10">
+						<UserCircle class="w-4 h-4 text-gray-400 dark:text-gray-500 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" />
+					</div>
+					<Select
+						v-model="selectedInstructor"
+						:options="instructorOptions"
+						:placeholder="__('Преподаватель')"
+						class="w-full sm:w-56 pl-10"
+						:disabled="instructorsLoading"
+						@update:modelValue="onInstructorChange"
+					/>
 				</div>
 			</div>
 		</div>
+
+		<!-- Active Filters Display -->
+		<div v-if="selectedCategory || selectedInstructor" class="mb-4 flex flex-wrap gap-2">
+			<div v-if="selectedCategory" class="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-full text-sm font-medium">
+				<Layers class="w-3.5 h-3.5" />
+				<span>{{ selectedCategory }}</span>
+				<button @click="selectedCategory = null; onCategoryChange()" class="hover:bg-blue-100 dark:hover:bg-blue-800/40 rounded-full p-0.5 transition-colors">
+					<X class="w-3.5 h-3.5" />
+				</button>
+			</div>
+			
+			<div v-if="selectedInstructor" class="inline-flex items-center gap-2 px-3 py-1.5 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 rounded-full text-sm font-medium">
+				<UserCircle class="w-3.5 h-3.5" />
+				<span>{{ getInstructorName(selectedInstructor) }}</span>
+				<button @click="selectedInstructor = null; onInstructorChange()" class="hover:bg-green-100 dark:hover:bg-green-800/40 rounded-full p-0.5 transition-colors">
+					<X class="w-3.5 h-3.5" />
+				</button>
+			</div>
+			
+			<button 
+				@click="clearAllFilters"
+				class="inline-flex items-center gap-1.5 px-3 py-1.5 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 text-sm font-medium transition-colors"
+			>
+				<span>{{ __('Очистить все') }}</span>
+			</button>
+		</div>
+
+		<CalendarSchedule
+			:category-filter="selectedCategory"
+			:instructor-filter="selectedInstructor"
+		/>
 	</div>
 </template>
 <script setup lang="ts">
-import { inject } from 'vue'
-import { createResource, Tooltip } from 'frappe-ui'
+import { inject, ref, computed, watch, onMounted } from 'vue'
+import { createResource, createListResource, Select } from 'frappe-ui'
 import { formatTime } from '@/utils'
 import {
 	Calendar,
@@ -148,10 +86,14 @@ import {
 	Monitor,
 	MoveRight,
 	Video,
+	Layers,
+	UserCircle,
+	X,
 } from 'lucide-vue-next'
 import CourseCard from '@/components/CourseCard.vue'
 import BatchCard from '@/components/BatchCard.vue'
 import UpcomingEvaluations from '@/components/UpcomingEvaluations.vue'
+import CalendarSchedule from '@/components/CalendarSchedule.vue'
 
 const dayjs = inject<any>('$dayjs')
 const user = inject<any>('$user')
@@ -159,6 +101,9 @@ const user = inject<any>('$user')
 const props = defineProps<{
 	myLiveClasses: any
 }>()
+
+const selectedCategory = ref(null)
+const selectedInstructor = ref(null)
 
 const myCourses = createResource({
 	url: 'lms.lms.api.get_my_courses',
@@ -169,6 +114,128 @@ const myBatches = createResource({
 	url: 'lms.lms.api.get_my_batches',
 	auto: true,
 })
+
+// Get categories from backend
+const categoriesList = createListResource({
+	doctype: 'LMS Category',
+	fields: ['name', 'category'],
+	auto: true,
+	orderBy: 'category asc',
+})
+
+// Get all instructors from backend
+const instructorsList = createListResource({
+	doctype: 'Course Evaluator',
+	fields: ['evaluator', 'full_name', 'username'],
+	auto: true,
+	orderBy: 'full_name asc',
+})
+
+// Get batches for filtering instructors by category
+const batchesForInstructors = createListResource({
+	doctype: 'LMS Batch',
+	url: 'lms.lms.utils.get_batches',
+	filters: {},
+	fields: ['instructors', 'categories'],
+	auto: true,
+})
+
+const categoryOptions = computed(() => {
+	const options = [{ label: __('Все категории'), value: null }]
+	if (categoriesList.data) {
+		categoriesList.data.forEach((cat) => {
+			if (cat.category) {
+				options.push({ label: cat.category, value: cat.category })
+			}
+		})
+	}
+	return options
+})
+
+const instructorOptions = computed(() => {
+	const options = [{ label: __('Все преподаватели'), value: null }]
+	
+	if (!instructorsList.data) return options
+	
+	// If category is selected (not null), filter instructors based on batches
+	if (selectedCategory.value) {
+		if (!batchesForInstructors.data) return options
+		
+		const instructorSet = new Set()
+		
+		batchesForInstructors.data.forEach((batch) => {
+			// Check if batch has the selected category
+			const hasCategory = batch.categories && 
+				batch.categories.some((cat) => cat.category === selectedCategory.value)
+			
+			if (hasCategory && batch.instructors) {
+				batch.instructors.forEach((inst) => {
+					const instructorName = inst.instructor || inst.name
+					if (instructorName) {
+						instructorSet.add(instructorName)
+					}
+				})
+			}
+		})
+		
+		// Filter instructors list to only show those in the category
+		instructorsList.data.forEach((inst) => {
+			if (instructorSet.has(inst.evaluator)) {
+				options.push({
+					label: inst.full_name || inst.evaluator,
+					value: inst.evaluator
+				})
+			}
+		})
+	} else {
+		// No category selected (null), show all instructors
+		instructorsList.data.forEach((inst) => {
+			options.push({
+				label: inst.full_name || inst.evaluator,
+				value: inst.evaluator
+			})
+		})
+	}
+	
+	return options
+})
+
+const instructorsLoading = computed(() => {
+	return instructorsList.list?.loading || batchesForInstructors.list?.loading
+})
+
+const onCategoryChange = () => {
+	// Don't reset instructor filter when category changes
+	// Reload batches with or without category filter
+	if (selectedCategory.value) {
+		// Load batches for the selected category to get instructors
+		batchesForInstructors.update({
+			filters: { category: selectedCategory.value }
+		})
+	} else {
+		// Load all batches when "Все категории" is selected
+		batchesForInstructors.update({
+			filters: {}
+		})
+	}
+	batchesForInstructors.reload()
+}
+
+const onInstructorChange = () => {
+	// Instructor changed, calendar will update automatically
+}
+
+const clearAllFilters = () => {
+	selectedCategory.value = null
+	selectedInstructor.value = null
+	onCategoryChange()
+}
+
+const getInstructorName = (evaluator) => {
+	if (!instructorsList.data) return evaluator
+	const instructor = instructorsList.data.find(inst => inst.evaluator === evaluator)
+	return instructor ? (instructor.full_name || instructor.evaluator) : evaluator
+}
 
 const getClassEnd = (cls: { date: string; time: string; duration: number }) => {
 	const classStart = new Date(`${cls.date}T${cls.time}`)

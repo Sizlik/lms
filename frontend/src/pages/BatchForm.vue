@@ -194,12 +194,20 @@
 							:label="__('Medium')"
 							class="mb-4"
 						/>
-						<Link
+						<MultiSelect
+							v-model="categories"
 							doctype="LMS Category"
-							:label="__('Category')"
-							v-model="batch.category"
-							:onCreate="(value, close) => openSettings('Categories', close)"
+							:label="__('Категории')"
+							:required="true"
+							:onCreate="(close) => openSettings('Categories', close)"
+							:filters="{ ignore_user_type: 1 }"
 						/>
+<!--						<Link-->
+<!--							doctype="LMS Category"-->
+<!--							:label="__('Category')"-->
+<!--							v-model="batch.category"-->
+<!--							:onCreate="(value, close) => openSettings('Categories', close)"-->
+<!--						/>-->
 					</div>
 					<div class="space-y-5">
 						<Uploader
@@ -311,6 +319,7 @@ const user = inject('$user')
 const { brand } = sessionStore()
 const { updateOnboardingStep } = useOnboarding('learning')
 const instructors = ref([])
+const categories = ref([])
 const app = getCurrentInstance()
 const { $dialog } = app.appContext.config.globalProperties
 
@@ -335,7 +344,6 @@ const batch = reactive({
 	confirmation_email_template: '',
 	seat_count: '',
 	medium: '',
-	category: '',
 	allow_self_enrollment: false,
 	certification: false,
 	meta_image: null,
@@ -392,6 +400,9 @@ const newBatch = createResource({
 				instructors: instructors.value.map((instructor) => ({
 					instructor: instructor,
 				})),
+				categories: categories.value.map((category) => ({
+					category: category,
+				})),
 				...batch,
 			},
 		}
@@ -419,7 +430,13 @@ const updateBatchData = (data) => {
 			})
 		} else if (['start_time', 'end_time'].includes(key)) {
 			batch[key] = formatTime(data[key])
-		} else if (Object.hasOwn(batch, key)) batch[key] = data[key]
+		} else if (Object.hasOwn(batch, key)) {
+			batch[key] = data[key]
+		} else if (key == 'categories') {
+			data.categories.forEach((category) => {
+				categories.value.push(category.category)
+			})
+		}
 	})
 	let checkboxes = [
 		'published',
@@ -450,6 +467,9 @@ const editBatch = createResource({
 				video_link: batch.video_link,
 				instructors: instructors.value.map((instructor) => ({
 					instructor: instructor,
+				})),
+				categories: categories.value.map((category) => ({
+					category: category,
 				})),
 				...batch,
 			},

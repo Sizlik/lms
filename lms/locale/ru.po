@@ -300,7 +300,7 @@ msgstr "Все"
 
 #: frontend/src/pages/Batches.vue:68
 msgid "All Batches"
-msgstr "Все занятия"
+msgstr "Все направления"
 
 #: frontend/src/pages/Courses.vue:57 lms/lms/widgets/BreadCrumb.html:3
 msgid "All Courses"
@@ -4327,7 +4327,7 @@ msgstr "Несколько правильных ответов"
 
 #: frontend/src/pages/Home/StudentHome.vue:40
 msgid "My Batches"
-msgstr "Мои занятия"
+msgstr "Мои направления"
 
 #: frontend/src/pages/Home/StudentHome.vue:8
 msgid "My Courses"
@@ -4773,7 +4773,7 @@ msgstr "Наши популярные курсы"
 
 #: frontend/src/pages/Home/StudentHome.vue:41
 msgid "Our Upcoming Batches"
-msgstr "Наши предстоящие занятия"
+msgstr "Наши предстоящие направления"
 
 #. Label of the output (Data) field in DocType 'LMS Test Case Submission'
 #: lms/lms/doctype/lms_test_case_submission/lms_test_case_submission.json
@@ -6987,7 +6987,7 @@ msgstr "Будущие"
 
 #: frontend/src/pages/Batch.vue:204 frontend/src/pages/Home/AdminHome.vue:34
 msgid "Upcoming Batches"
-msgstr "Будущие занятия"
+msgstr "Будущие направления"
 
 #: frontend/src/components/UpcomingEvaluations.vue:5
 #: frontend/src/pages/Home/AdminHome.vue:92 lms/templates/upcoming_evals.html:3

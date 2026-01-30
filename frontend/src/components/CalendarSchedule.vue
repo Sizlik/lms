@@ -19,6 +19,7 @@
 			</div>
 			<div class="flex items-center gap-2">
 				<Button
+					v-if="isInstructor"
 					variant="solid"
 					@click="showCreateBatchModal = true"
 					class="dark:bg-blue-600 dark:hover:bg-blue-700"
@@ -98,11 +99,14 @@
 							<div
 								v-for="event in getEventsForDate(date)"
 								:key="event.id"
-								class="text-xs p-1.5 rounded shadow-sm cursor-pointer hover:brightness-110 truncate font-medium"
+								class="text-xs p-1.5 rounded shadow-sm cursor-pointer hover:brightness-110 font-medium"
 								:style="{ backgroundColor: event.color, color: event.textColor }"
 								@click="openEventModal(event)"
 							>
-								{{ event.title }}
+								<div class="truncate font-semibold">{{ event.title }}</div>
+								<div v-if="event.time && event.startTime !== '00:00'" class="text-[10px] opacity-90 mt-0.5">
+									{{ event.time }}
+								</div>
 							</div>
 						</div>
 					</div>
@@ -226,7 +230,7 @@
 		<Dialog
 			v-model="showCreateBatchModal"
 			:options="{
-				title: __('Создать занятие'),
+				title: __('Создать направление'),
 				size: 'lg',
 				actions: [
 					{
@@ -423,6 +427,17 @@ import {
 	Plus
 } from 'lucide-vue-next'
 
+const props = defineProps({
+	categoryFilter: {
+		type: String,
+		default: null,
+	},
+	instructorFilter: {
+		type: String,
+		default: null,
+	},
+})
+
 const dayjs = inject('$dayjs')
 const user = inject('$user')
 
@@ -494,12 +509,62 @@ const isAdmin = computed(() => {
 	)
 })
 
+const isInstructor = computed(() => {
+	return user.data?.is_instructor
+})
+
+const batchFilters = ref({})
+
 const batches = createListResource({
 	doctype: 'LMS Batch',
 	url: 'lms.lms.utils.get_batches',
-	filters: {},
-	fields: ['name', 'title', 'start_date', 'end_date', 'start_time', 'end_time', 'timezone', 'category'],
+	filters: batchFilters,
+	fields: ['name', 'title', 'start_date', 'end_date', 'start_time', 'end_time', 'timezone', 'category', 'instructors'],
 	auto: true,
+})
+
+// Update batch filters when props change
+const updateBatchFilters = () => {
+	const newFilters = {}
+
+	// Filter by category if provided
+	if (props.categoryFilter) {
+		newFilters.category = props.categoryFilter
+	}
+
+	// Filter by instructor if provided
+	if (props.instructorFilter) {
+		newFilters.instructor = props.instructorFilter
+	}
+
+	// Always filter batches from today onwards
+	// Only show batches that haven't ended yet (end_date >= today)
+	const today = dayjs().format('YYYY-MM-DD')
+	newFilters.end_date = ['>=', today]
+
+	batchFilters.value = newFilters
+	batches.update({
+		filters: newFilters
+	})
+	batches.reload()
+}
+
+// Watch for filter changes
+watch(
+	() => [props.categoryFilter, props.instructorFilter],
+	() => {
+		updateBatchFilters()
+	},
+	{ immediate: true }
+)
+
+// Filtered batches - now all filtering happens on server-side
+const filteredBatches = computed(() => {
+	if (!batches.data || !batches.data.length) return []
+
+	// All filtering is now done on the server via batchFilters
+	// Return batches data as-is
+	return batches.data
 })
 
 const myLiveClasses = createResource({
@@ -533,26 +598,31 @@ const courses = createResource({
 
 const allEvents = computed(() => {
 	const events = []
+	const today = dayjs().startOf('day')
 
-	if (filters.value.batches && batches.data?.length) {
-		batches.data.forEach((batch) => {
+	if (filters.value.batches && filteredBatches.value?.length) {
+		filteredBatches.value.forEach((batch) => {
 			if (batch.start_date && batch.end_date) {
 				const startDate = dayjs(batch.start_date)
 				const endDate = dayjs(batch.end_date)
 				let date = startDate
 				while (date.isBefore(endDate) || date.isSame(endDate, 'day')) {
-					events.push({
-						id: `batch-${batch.name}-${date.format('YYYY-MM-DD')}`,
-						type: 'batch',
-						title: batch.title || batch.name,
-						date: date.format('YYYY-MM-DD'),
-						startTime: batch.start_time || '00:00',
-						endTime: batch.end_time || '23:59',
-						color: eventColors.batch,
-						textColor: '#ffffff',
-						batchName: batch.name,
-						dateTime: `${date.format('MMM D, YYYY')} ${formatTime(batch.start_time)} - ${formatTime(batch.end_time)}`,
-					})
+					// Only show events for today and future dates
+					if (date.isSame(today, 'day') || date.isAfter(today)) {
+						events.push({
+							id: `batch-${batch.name}-${date.format('YYYY-MM-DD')}`,
+							type: 'batch',
+							title: batch.title || batch.name,
+							date: date.format('YYYY-MM-DD'),
+							startTime: batch.start_time || '00:00',
+							endTime: batch.end_time || '23:59',
+							color: eventColors.batch,
+							textColor: '#ffffff',
+							batchName: batch.name,
+							dateTime: `${date.format('MMM D, YYYY')} ${formatTime(batch.start_time)} - ${formatTime(batch.end_time)}`,
+							time: formatTime(batch.start_time),
+						})
+					}
 					date = date.add(1, 'day')
 				}
 			}

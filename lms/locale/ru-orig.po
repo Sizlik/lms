@@ -3447,7 +3447,7 @@ msgstr "Отзыв о пакете LMS"
 #. Name of a DocType
 #: lms/lms/doctype/lms_batch_timetable/lms_batch_timetable.json
 msgid "LMS Batch Timetable"
-msgstr "Расписание занятий в группе LMS"
+msgstr "Расписание направлений в группе LMS"
 
 #. Name of a DocType
 #: lms/lms/doctype/lms_category/lms_category.json

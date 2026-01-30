@@ -228,6 +228,27 @@ def get_instructors(doctype, docname):
 	return instructor_details
 
 
+def get_categories(doctype, docname):
+	category_details = []
+	categories = frappe.get_all(
+		"Batch Categories",
+		{"parent": docname, "parenttype": doctype},
+		order_by="idx",
+		pluck="category",
+	)
+
+	for category in categories:
+		category_details.append(
+			frappe.db.get_value(
+				"LMS Category",
+				category,
+				["category"],
+				as_dict=True,
+			)
+		)
+	return category_details
+
+
 def get_average_rating(course):
 	ratings = [review.rating for review in get_reviews(course)]
 	if not len(ratings):
@@ -1142,7 +1163,6 @@ def get_batch_details(batch):
 			"allow_self_enrollment",
 			"certification",
 			"timezone",
-			"category",
 			"zoom_account",
 			"telemost"
 		],
@@ -1150,6 +1170,7 @@ def get_batch_details(batch):
 	)
 
 	batch_details.instructors = get_instructors("LMS Batch", batch)
+	batch_details.categories = get_categories("LMS Batch", batch)
 	batch_details.accept_enrollments = batch_details.start_date > getdate()
 
 	if (
@@ -2003,7 +2024,6 @@ def get_batches(filters=None, start=0, order_by="start_date"):
 			"end_time",
 			"timezone",
 			"published",
-			"category",
 		],
 		order_by=order_by,
 		start=start,

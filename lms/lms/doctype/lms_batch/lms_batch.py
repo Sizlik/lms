@@ -42,9 +42,10 @@ class LMSBatch(Document):
 			"Authorization": f"OAuth {key}"
 		}
 		response = requests.post("https://cloud-api.yandex.net/v1/telemost-api/conferences", headers=headers).json()
-		self.append("instructors", {
-			"instructor": self.get_or_create_instructor()
-		})
+		if not self.instructors:
+			self.append("instructors", {
+				"instructor": self.get_or_create_instructor()
+			})
 		self.telemost = response.get("join_url")
 		self.timezone = "UTC+3"
 

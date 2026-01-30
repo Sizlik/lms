@@ -30,7 +30,7 @@
   "zoom_account",
   "section_break_rgfj",
   "medium",
-  "category",
+  "categories",
   "confirmation_email_template",
   "column_break_flwy",
   "seat_count",
@@ -167,13 +167,6 @@
   {
    "fieldname": "column_break_flwy",
    "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "category",
-   "fieldtype": "Link",
-   "in_standard_filter": 1,
-   "label": "Category",
-   "options": "LMS Category"
   },
   {
    "description": "These customisations will work on the main batch page.",
@@ -319,14 +312,14 @@
    "fieldname": "timezone",
    "fieldtype": "Data",
    "label": "Timezone",
-   "reqd": 0
+   "reqd": 1
   },
   {
    "fieldname": "instructors",
    "fieldtype": "Table MultiSelect",
    "label": "Instructors",
    "options": "Course Instructor",
-   "reqd": 0
+   "reqd": 1
   },
   {
    "fieldname": "section_break_khcn",
@@ -392,6 +385,14 @@
    "fieldtype": "Link",
    "label": "Zoom",
    "options": "LMS Zoom Settings"
+  },
+  {
+   "fieldname": "categories",
+   "fieldtype": "Table MultiSelect",
+   "in_standard_filter": 1,
+   "label": "Categories",
+   "options": "Batch Categories",
+   "reqd": 1
   }
  ],
  "grid_page_length": 50,
@@ -414,7 +415,7 @@
    "link_fieldname": "payment_for_document"
   }
  ],
- "modified": "2026-01-22 21:25:44.146638",
+ "modified": "2026-01-30 19:14:29.069464",
  "modified_by": "Administrator",
  "module": "LMS",
  "name": "LMS Batch",

@@ -65,65 +65,66 @@
 			class="flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:items-center justify-between mb-5"
 		>
 			<div class="text-lg text-ink-gray-9 font-semibold">
-				{{ __('All Batches') }}
+				{{ __('Мои направления') }}
 			</div>
-			<div
-				class="flex flex-col space-y-3 lg:space-y-0 lg:flex-row lg:items-center lg:space-x-4"
-			>
-				<TabButtons
-					v-if="user.data"
-					:buttons="batchTabs"
-					v-model="currentTab"
-					class="w-fit"
-				/>
-				<div class="grid grid-cols-2 gap-2">
-					<FormControl
-						v-model="title"
-						:placeholder="__('Search by Title')"
-						type="text"
-						class="min-w-40 lg:min-w-0 lg:w-32 xl:w-40"
-						@input="updateBatches()"
-					/>
-					<div class="min-w-40 lg:min-w-0 lg:w-32 xl:w-40">
-						<Select
-							v-if="categories.length"
-							v-model="currentCategory"
-							:options="categories"
-							:placeholder="__('Category')"
-							@update:modelValue="updateBatches()"
-						/>
-					</div>
-				</div>
+<!--			<div-->
+<!--				class="flex flex-col space-y-3 lg:space-y-0 lg:flex-row lg:items-center lg:space-x-4"-->
+<!--			>-->
+<!--				<TabButtons-->
+<!--					v-if="user.data"-->
+<!--					:buttons="batchTabs"-->
+<!--					v-model="currentTab"-->
+<!--					class="w-fit"-->
+<!--				/>-->
+<!--				<div class="grid grid-cols-2 gap-2">-->
+<!--					<FormControl-->
+<!--						v-model="title"-->
+<!--						:placeholder="__('Search by Title')"-->
+<!--						type="text"-->
+<!--						class="min-w-40 lg:min-w-0 lg:w-32 xl:w-40"-->
+<!--						@input="updateBatches()"-->
+<!--					/>-->
+<!--					<div class="min-w-40 lg:min-w-0 lg:w-32 xl:w-40">-->
+<!--						<Select-->
+<!--							v-if="categories.length"-->
+<!--							v-model="currentCategory"-->
+<!--							:options="categories"-->
+<!--							:placeholder="__('Category')"-->
+<!--							@update:modelValue="updateBatches()"-->
+<!--						/>-->
+<!--					</div>-->
+<!--				</div>-->
 
-				<FormControl
-					v-model="certification"
-					:label="__('Certification')"
-					type="checkbox"
-					@change="updateBatches()"
-				/>
-			</div>
+<!--				<FormControl-->
+<!--					v-model="certification"-->
+<!--					:label="__('Certification')"-->
+<!--					type="checkbox"-->
+<!--					@change="updateBatches()"-->
+<!--				/>-->
+<!--			</div>-->
 		</div>
-		<div
-			v-if="batches.data?.length"
-			class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"
-		>
-			<router-link
-				v-for="batch in batches.data"
-				:to="{ name: 'BatchDetail', params: { batchName: batch.name } }"
-			>
-				<BatchCard :batch="batch" />
-			</router-link>
-		</div>
-		<EmptyState v-else-if="!batches.list.loading" type="Batches" />
+		<CalendarSchedule />
+<!--		<div-->
+<!--			v-if="batches.data?.length"-->
+<!--			class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"-->
+<!--		>-->
+<!--			<router-link-->
+<!--				v-for="batch in batches.data"-->
+<!--				:to="{ name: 'BatchDetail', params: { batchName: batch.name } }"-->
+<!--			>-->
+<!--				<BatchCard :batch="batch" />-->
+<!--			</router-link>-->
+<!--		</div>-->
+<!--		<EmptyState v-else-if="!batches.list.loading" type="Batches" />-->
 
-		<div
-			v-if="!batches.list.loading && batches.hasNextPage"
-			class="flex justify-center mt-5"
-		>
-			<Button @click="batches.next()">
-				{{ __('Load More') }}
-			</Button>
-		</div>
+<!--		<div-->
+<!--			v-if="!batches.list.loading && batches.hasNextPage"-->
+<!--			class="flex justify-center mt-5"-->
+<!--		>-->
+<!--			<Button @click="batches.next()">-->
+<!--				{{ __('Load More') }}-->
+<!--			</Button>-->
+<!--		</div>-->
 	</div>
 </template>
 <script setup>
@@ -144,6 +145,7 @@ import { ChevronDown, Plus } from 'lucide-vue-next'
 import { sessionStore } from '@/stores/session'
 import BatchCard from '@/components/BatchCard.vue'
 import EmptyState from '@/components/EmptyState.vue'
+import CalendarSchedule from '@/components/CalendarSchedule.vue'
 
 const user = inject('$user')
 const dayjs = inject('$dayjs')
@@ -186,7 +188,8 @@ const batches = createListResource({
 	pageLength: pageLength.value,
 	start: start.value,
 	onSuccess(data) {
-		let allCategories = data.map((batch) => batch.category)
+		let allCategories = []
+		data.forEach((batch) => batch.categories.forEach((category) => allCategories.push(category)))
 		allCategories = allCategories.filter(
 			(category, index) => allCategories.indexOf(category) === index && category
 		)
