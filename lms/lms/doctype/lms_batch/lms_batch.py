@@ -50,14 +50,19 @@ class LMSBatch(Document):
 
 	def get_or_create_instructor(self):
 		user = frappe.session.user
-		evaluator = frappe.db.get_value("Course Evaluator", {"evaluator": user})
-		if not evaluator:
+		evaluator_name = frappe.db.get_value(
+			"Course Evaluator",
+			{"evaluator": user},
+			"name"
+		)
+
+		if not evaluator_name:
 			evaluator = frappe.new_doc("Course Evaluator")
 			evaluator.evaluator = user
 			evaluator.insert(ignore_permissions=True)
-			return evaluator
-		else:
-			return evaluator
+			return evaluator.name
+
+		return evaluator_name
 
 	def on_update(self):
 		if self.has_value_changed("published") and self.published:
