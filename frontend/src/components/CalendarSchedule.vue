@@ -393,6 +393,32 @@
 							</div>
 						</div>
 
+						<div v-if="selectedEvent.type === 'batch' && selectedEvent.telemost" class="mb-6">
+							<div class="flex items-center gap-1">
+								<div class="inline-flex items-center p-0.5 rounded-md border dark:border-gray-700 bg-surface-gray-1 dark:bg-gray-800 shadow-sm w-full">
+									<a
+										:href="selectedEvent.telemost"
+										target="_blank"
+										class="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-ink-gray-8 dark:text-gray-200 hover:bg-surface-white dark:hover:bg-gray-700 rounded-l-[5px] transition-colors w-full"
+									>
+										<Video class="h-4 w-4 text-ink-gray-5 dark:text-gray-400" />
+										<span>Телемост</span>
+									</a>
+
+									<div class="w-px h-4 bg-outline-gray-2 dark:bg-gray-700"></div>
+
+									<button
+										@click="copyToClipboard(selectedEvent.telemost)"
+										class="flex items-center justify-center p-2 text-ink-gray-5 dark:text-gray-400 hover:text-ink-gray-9 dark:hover:text-white hover:bg-surface-white dark:hover:bg-gray-700 rounded-r-[5px] transition-colors"
+										title="Скопировать ссылку"
+									>
+										<Check v-if="copied" class="h-3.5 w-3.5 text-green-600" />
+										<Copy v-else class="h-3.5 w-3.5" />
+									</button>
+								</div>
+							</div>
+						</div>
+
 						<div class="flex justify-end gap-3 pt-4 border-t dark:border-gray-700">
 							<a
 								v-if="selectedEvent.type === 'liveClass' && selectedEvent.joinUrl"
@@ -446,7 +472,9 @@ import {
 	Clock,
 	AlignLeft,
 	BookOpen,
-	Plus
+	Plus,
+	Copy,
+	Check
 } from 'lucide-vue-next'
 
 const props = defineProps({
@@ -541,7 +569,7 @@ const batches = createListResource({
 	doctype: 'LMS Batch',
 	url: 'lms.lms.utils.get_batches',
 	filters: batchFilters,
-	fields: ['name', 'title', 'start_date', 'end_date', 'start_time', 'end_time', 'timezone', 'category', 'instructors'],
+	fields: ['name', 'title', 'start_date', 'end_date', 'start_time', 'end_time', 'timezone', 'category', 'instructors', 'telemost'],
 	auto: true,
 })
 
@@ -641,6 +669,7 @@ const allEvents = computed(() => {
 							color: eventColors.batch,
 							textColor: '#ffffff',
 							batchName: batch.name,
+							telemost: batch.telemost,
 							dateTime: `${date.format('MMM D, YYYY')} ${formatTime(batch.start_time)} - ${formatTime(batch.end_time)}`,
 							time: formatTime(batch.start_time),
 						})
@@ -739,10 +768,23 @@ const nextPeriod = () => {
 
 const showEventModal = ref(false)
 const selectedEvent = ref(null)
+const copied = ref(false)
 
 const openEventModal = (event) => {
 	selectedEvent.value = event
 	showEventModal.value = true
+}
+
+const copyToClipboard = async (text) => {
+	try {
+		await navigator.clipboard.writeText(text)
+		copied.value = true
+		setTimeout(() => {
+			copied.value = false
+		}, 2000)
+	} catch (err) {
+		console.error('Не удалось скопировать текст: ', err)
+	}
 }
 
 const showCreateBatchModal = ref(false)
