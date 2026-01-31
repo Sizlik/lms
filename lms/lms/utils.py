@@ -2023,6 +2023,7 @@ def get_batches(filters=None, start=0, order_by="start_date"):
 			"start_time",
 			"end_time",
 			"timezone",
+			"telemost",
 			"published",
 		],
 		order_by=order_by,
